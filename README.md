@@ -9,6 +9,9 @@
 * [License](#license)
 
 
+# Notes:
+- Uses net5.0
+- Node v16.13.1
 
 ## Description
 

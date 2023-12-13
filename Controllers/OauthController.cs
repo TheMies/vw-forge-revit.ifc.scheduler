@@ -83,7 +83,7 @@ namespace RevitToIfcScheduler.Controllers
                         scope = AppConfig.ThreeLegScope,
                         state = encodedRedirectUrl
                     });
-                
+                    
                 return Ok(forgeAuthUrl.ToString());
             }
             catch (Exception ex)

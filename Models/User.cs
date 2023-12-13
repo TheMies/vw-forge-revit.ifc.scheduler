@@ -125,7 +125,9 @@ namespace RevitToIfcScheduler.Models
                 
                 foreach (var account in accounts)
                 {
-                    var url = account.Region == "EU"
+                    //US  : https://developer.api.autodesk.com/hq/v1/accounts/:account_id/users/:user_id
+                    //EMEA:	https://developer.api.autodesk.com/hq/v1/regions/eu/accounts/:account_id/users/:user_id
+                    var url = account.Region is "EU" or "EMEA" 
                         ? $@"https://developer.api.autodesk.com/hq/v1/regions/eu/accounts/{account.AccountId}/users/{AutodeskId}"
                         : $@"https://developer.api.autodesk.com/hq/v1/accounts/{account.AccountId}/users/{AutodeskId}";
 
@@ -135,8 +137,6 @@ namespace RevitToIfcScheduler.Models
                     {
                         var jsonResponse = result.Content.ReadAsStringAsync().Result;
                         dynamic data = JsonConvert.DeserializeObject<dynamic>(jsonResponse);
-
-                                              
                         
                         if (data.role == "account_admin" && data.status == "active" || AppConfig.AdminEmails.Contains(Email))
                         {

@@ -351,7 +351,7 @@ namespace RevitToIfcScheduler.Utilities
                 TokenGetter tokenGetter = new TwoLeggedTokenGetter();
                 var token = await tokenGetter.GetToken();
 
-                var regionSpecifier = conversionJob.Region == "EU" ? "/regions/eu" : "";
+                var regionSpecifier = conversionJob.Region is "EU" or "EMEA" ? "/regions/eu" : "";
                 var url = $"{AppConfig.ForgeBaseUrl}/modelderivative/v2{regionSpecifier}/designdata/job";
 
                 var body =
@@ -466,7 +466,7 @@ namespace RevitToIfcScheduler.Utilities
 
         public static async Task<dynamic> GetModelDerivativeManifest(string urn, string token, string region)
         {
-            var regionSpecifier = region == "EU" ? "/regions/eu" : "";
+            var regionSpecifier = region == "EMEA" ? "/regions/eu" : "";
             var url = $"{AppConfig.ForgeBaseUrl}/modelderivative/v2{regionSpecifier}/designdata/{urn}/manifest";
 
             var response = await url
@@ -503,7 +503,7 @@ namespace RevitToIfcScheduler.Utilities
         {
             try
             {
-                var regionSpecifier = region == "EU" ? "/regions/eu" : "";
+                var regionSpecifier = region == "EMEA" ? "/regions/eu" : "";
                 var urn = Base64Encoder.Encode(fileUrn).Replace('/', '_');
                 var url = $"{AppConfig.ForgeBaseUrl}/modelderivative/v2{regionSpecifier}/designdata/{urn}/manifest";
 
@@ -546,13 +546,14 @@ namespace RevitToIfcScheduler.Utilities
         {
             try
             {
-                var regionSpecifier = conversionJob.Region == "EU" ? "/regions/eu" : "";
+                var regionSpecifier = conversionJob.Region is "EU" or "EMEA" ? "/regions/eu" : "";
                 var objectName = storageLocation.Split('/').Last();
                 var urlEncodedDerivative = UrlEncoder.Default.Encode(derivativeUrn);
                 var base64EncodedFileUrn = !string.IsNullOrWhiteSpace(conversionJob.EncodedInputStorageLocation) ? conversionJob.EncodedInputStorageLocation : conversionJob.EncodedFileUrn;
 
                 var downloadUrl = $"{AppConfig.ForgeBaseUrl}/modelderivative/v2{regionSpecifier}/designdata/{base64EncodedFileUrn}/manifest/{urlEncodedDerivative}";
-                var uploadStreamUrl = $"{AppConfig.ForgeBaseUrl}/oss/v2/buckets/wip.dm.prod/objects/{objectName}";
+                //var uploadStreamUrl = $"{AppConfig.ForgeBaseUrl}/oss/v2/buckets/wip.dm.prod/objects/{objectName}";
+                var uploadStreamUrl = $"{AppConfig.ForgeBaseUrl}/oss/v2/buckets/{AppConfig.BucketKey}/objects/{objectName}";
 
 
                 //Get the length of the object
@@ -809,10 +810,8 @@ namespace RevitToIfcScheduler.Utilities
         }
 
         public static async Task CreateFirstVersion(string projectId, string folderId, string objectId,
-            string fileName, string suffix, string token)
-        {
-            try
-            {
+            string fileName, string suffix, string token) {
+            try {
                 var name = fileName.Split('.').First();
                 if (string.IsNullOrWhiteSpace(suffix))
                     name = name + ".ifc";
@@ -821,65 +820,50 @@ namespace RevitToIfcScheduler.Utilities
 
                 var url = $"{AppConfig.ForgeBaseUrl}/data/v1/projects/{projectId}/items";
 
-                var body = new
-                {
-                    jsonapi = new
-                    {
+                var body = new {
+                    jsonapi = new {
                         version = "1.0"
                     },
-                    data = new
-                    {
+                    data = new {
                         type = "items",
-                        attributes = new
-                        {
+                        attributes = new {
                             displayName = name,
-                            extension = new
-                            {
-                                type = "items:autodesk.bim360:File",
+                            extension = new {
+                                //type = "items:autodesk.bim360:File",
+                                type = "items:autodesk.core:File",
                                 version = "1.0"
                             }
                         },
-                        relationships = new
-                        {
-                            tip = new
-                            {
-                                data = new
-                                {
+                        relationships = new {
+                            tip = new {
+                                data = new {
                                     type = "versions",
                                     id = "1"
                                 }
                             },
-                            parent = new
-                            {
-                                data = new
-                                {
+                            parent = new {
+                                data = new {
                                     type = "folders",
                                     id = folderId
                                 }
                             }
                         }
                     },
-                    included = new List<dynamic>()
-                    {
-                        new
-                        {
+                    included = new List<dynamic>() {
+                        new {
                             type = "versions",
                             id = "1",
-                            attributes = new
-                            {
+                            attributes = new {
                                 name = name,
-                                extension = new
-                                {
-                                    type = "versions:autodesk.bim360:File",
+                                extension = new {
+                                    //type = "versions:autodesk.bim360:File",
+                                    type = "versions:autodesk.core:File",
                                     version = "1.0"
                                 }
                             },
-                            relationships = new
-                            {
-                                storage = new
-                                {
-                                    data = new
-                                    {
+                            relationships = new {
+                                storage = new {
+                                    data = new {
                                         type = "objects",
                                         id = objectId
                                     }

@@ -18,21 +18,17 @@ export const ConvertToIfcNowModal = observer(({project, schedule, show, setShow}
 
     function convertSelected(){
         //If Schedule prop exists, use those selected files. If not, use the project selected files
-
-
-
         setLoading(true);
         const base = schedule ? schedule : project;
-
         const files = base.checked
             .filter(val=>val.indexOf("_placeholderChild") === -1)
-            .filter(val=>val.indexOf("urn:adsk.wipprod:fs.file") > -1)
+            .filter(val => val.indexOf("urn:adsk.wipprod:fs.file") > -1 || val.indexOf("urn:adsk.wipemea:fs.file") > -1)
             .map(val=>project.filesHash[val]!.toInterface());
-
         const folderIds = base.checked
             .filter(val=>val.indexOf("_placeholderChild") === -1)
-            .filter(val=>val.indexOf("urn:adsk.wipprod:fs.folder") > -1);
-
+            .filter(val => val.indexOf("urn:adsk.wipprod:fs.folder") > -1 || val.indexOf("urn:adsk.wipemea:fs.folder") > -1);
+        console.info('files ->', files);
+        console.info('base.checked ->', base.checked);
         ApiCalls
             .PostConversion({project, files: files, folderUrns: folderIds, ifcSettingsName: ifcSettingsName || ""})
             .finally(()=>{

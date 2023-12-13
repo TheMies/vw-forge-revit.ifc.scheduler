@@ -32,7 +32,7 @@ export const ProjectFoldersAndFiles = observer(({project, checked, setChecked, e
             return t("Folders not yet expanded")
         } else {
             return checked
-                .filter(val=>val.indexOf('urn:adsk.wipprod:fs.file:') > -1 && val.indexOf('_placeholderChild') === -1)
+                .filter(val=>val.indexOf('urn:adsk.wipprod:fs.file:') > -1 && val.indexOf('_placeholderChild') === -1 || val.indexOf('urn:adsk.wipemea:fs.file:') > -1 && val.indexOf('_placeholderChild') === -1)
                 .reduce((acc: string[], val)=>{
                     return acc.indexOf(val) === -1 ? acc.concat([val]) : acc;
                 }, [])

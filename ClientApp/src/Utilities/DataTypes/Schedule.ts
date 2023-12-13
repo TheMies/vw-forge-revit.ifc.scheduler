@@ -63,7 +63,7 @@ export class Schedule{
         const flatChildrenArray = this.project.getFlatChildrenArray();
 
         this.fileUrns = flatChildrenArray
-            .filter(val=> val.isChecked(checked) && val.id.indexOf('urn:adsk.wipprod:fs.file:') > -1)
+            .filter(val=> val.isChecked(checked) && (val.id.indexOf('urn:adsk.wipprod:fs.file:') > -1 || val.id.indexOf('urn:adsk.wipemea:fs.file:') > -1))
             .map(val=>val.id)
         this.folderUrns = flatChildrenArray
             .filter(val=> val.isChecked(checked) && val instanceof Folder && !(val.parent?.isChecked(checked)))

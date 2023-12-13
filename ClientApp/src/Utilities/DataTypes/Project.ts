@@ -116,7 +116,7 @@ export class Project{
         const flatChildrenArray = this.getFlatChildrenArray();
 
         const fileUrns = flatChildrenArray
-            .filter(val=> val.isChecked() && val.id.indexOf('urn:adsk.wipprod:fs.file:') > -1)
+            .filter(val=> val.isChecked() && (val.id.indexOf('urn:adsk.wipprod:fs.file:') > -1 || val.id.indexOf('urn:adsk.wipemea:fs.file:') > -1))
             .map(val=>val.id)
         const folderUrns = flatChildrenArray
             .filter(val=> val.isChecked() && val instanceof Folder && !(val.parent?.isChecked()))
